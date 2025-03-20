@@ -67,7 +67,7 @@ func Login(c *gin.Context) {
 
 	if c.Bind(&body) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to read body",
+			"error": "Fail  ed to read body",
 		})
 
 		return
