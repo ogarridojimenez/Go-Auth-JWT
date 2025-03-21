@@ -13,7 +13,7 @@ import (
 )
 
 func Signup(c *gin.Context) {
-	// Get the email/ pass  off req body
+	//TODO: Get the email/ pass  off req body
 	var body struct {
 		Email    string
 		Password string
@@ -27,7 +27,7 @@ func Signup(c *gin.Context) {
 		return
 	}
 
-	// Hash the password
+	//TODO: Hash the password
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)
 
@@ -39,7 +39,7 @@ func Signup(c *gin.Context) {
 		return
 	}
 
-	//Create the user
+	//TODO: Create the user
 
 	user := models.User{Email: body.Email, Password: string(hash)}
 
@@ -52,14 +52,14 @@ func Signup(c *gin.Context) {
 
 		return
 	}
-	//Respond
+	//TODO: Respond
 	c.JSON(http.StatusOK, gin.H{
 		"Usuario": body.Email,
 	})
 }
 
 func Login(c *gin.Context) {
-	//Get the email and pass off req body
+	//TODO: Get the email and pass off req body
 	var body struct {
 		Email    string
 		Password string
@@ -72,7 +72,7 @@ func Login(c *gin.Context) {
 
 		return
 	}
-	//look up requested user
+	//TODO: look up requested user
 	var user models.User
 	initializers.DB.First(&user, "email = ?", body.Email)
 	if user.ID == 0 {
@@ -82,7 +82,7 @@ func Login(c *gin.Context) {
 
 		return
 	}
-	//Compare sent int pass with saved user pass hash
+	//TODO: Compare sent int pass with saved user pass hash
 
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
 	if err != nil {
@@ -91,15 +91,15 @@ func Login(c *gin.Context) {
 		})
 		return
 	}
-	//Generate a jwt token
-	// Create a new token object, specifying signing method and the claims
-	// you would like it to contain.
+	//TODO: Generate a jwt token
+	//TODO: Create a new token object, specifying signing method and the claims
+	//TODO: you would like it to contain.
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": user.ID,
 		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
 	})
 
-	// Sign and get the complete encoded token as a string using the secret
+	//TODO: Sign and get the complete encoded token as a string using the secret
 	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -108,12 +108,21 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	//send it back
+	//TODO: send it back
 
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"token": tokenString,
+	})
+}
+
+func Validate(c *gin.Context) {
+
+	user, _ := c.Get("user")
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": user,
 	})
 }
